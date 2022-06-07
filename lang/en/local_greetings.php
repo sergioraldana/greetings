@@ -19,7 +19,7 @@
  *
  * @package     local_greetings
  * @category    string
- * @copyright   2022 Sergio Renato Aldana Alvarez
+ * @copyright   2022 Sergio Renato Aldana Alvarez <sergior.aldana@me.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
