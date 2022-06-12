@@ -42,6 +42,12 @@ function local_greetings_extend_navigation_frontpage(navigation_node $frontpage)
     );
 }
 
+/**
+ * Insert a link to index.php on the site drawer navigation.
+ *
+ * @param global_navigation $root Node representing the front page in the navigation tree.
+ */
+
 function local_greetings_extend_navigation(global_navigation $root) {
     $node = navigation_node::create(
         get_string('pluginname', 'local_greetings'),

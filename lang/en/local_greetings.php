@@ -33,3 +33,4 @@ $string['greetinguseres'] = 'Hola, {$a}.';
 $string['greetinguserfj'] = 'Bula, {$a}.';
 $string['greetingusernz'] = 'Kia Ora, {$a}.';
 $string['greetingusergt'] = 'Que onda, {$a}.';
+$string['yourmessage'] = 'Your message';
