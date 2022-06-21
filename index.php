@@ -44,7 +44,7 @@ $allowpost = has_capability('local/greetings:postmessages', $context);
 $allowview = has_capability('local/greetings:viewmessages', $context);
 $deleteanypost = has_capability('local/greetings:deleteanymessage', $context);
 
-if ($action == 'del') {
+if ($action === 'del') {
     $id = required_param('id', PARAM_TEXT);
 
     if ($deleteanypost) {
@@ -66,16 +66,17 @@ if ($allowpost) {
     $messageform->display();
 }
 
-$userfields = \core_user\fields::for_name()->with_identity($context);
-$userfieldssql = $userfields->get_sql('u');
+if ($allowview) {
+    $userfields = \core_user\fields::for_name()->with_identity($context);
+    $userfieldssql = $userfields->get_sql('u');
 
-$sql = "SELECT m.id, m.message, m.timecreated, m.userid {$userfieldssql->selects}
+    $sql = "SELECT m.id, m.message, m.timecreated, m.userid {$userfieldssql->selects}
         FROM {local_greetings_messages} m
         LEFT JOIN {user} u ON u.id = m.userid
         ORDER BY timecreated DESC";
 
-if ($allowview) {
     $messages = $DB->get_records_sql($sql);
+
     echo $OUTPUT->box_start('card-columns');
     foreach ($messages as $m) {
         echo html_writer::start_tag('div', array('class' => 'card'));
@@ -86,6 +87,7 @@ if ($allowview) {
         echo html_writer::tag('small', userdate($m->timecreated), array('class' => 'text-muted'));
         echo html_writer::end_tag('p');
         echo html_writer::end_tag('div');
+
         if ($deleteanypost) {
             echo html_writer::start_tag('div', array('class' => 'card-footer text-center'));
             echo html_writer::link(
