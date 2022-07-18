@@ -32,7 +32,7 @@ defined('MOODLE_INTERNAL') || die();
  */
 
 function local_greetings_extend_navigation_frontpage(navigation_node $frontpage) {
-    if (isloggedin() && !isguestuser()) {
+    if (isloggedin() && !isguestuser() && $frontpage->showinflatnavigation = get_config('local_greetings', 'showinnavigation')) {
         $frontpage->add(get_string(
             'pluginname', 'local_greetings'),
             new moodle_url('/local/greetings/index.php'),
@@ -60,7 +60,8 @@ function local_greetings_extend_navigation(global_navigation $root) {
             null,
             new pix_icon('t/message', '')
         );
-        $node->showinflatnavigation = true;
+        //$node->showinflatnavigation = true;
+        $node->showinflatnavigation = get_config('local_greetings', 'showinnavigation');
         $root->add_node($node);
     }
 }
