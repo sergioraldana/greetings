@@ -45,6 +45,7 @@ $allowview = has_capability('local/greetings:viewmessages', $context);
 $deleteanypost = has_capability('local/greetings:deleteanymessage', $context);
 
 if ($action === 'del') {
+    require_sesskey(); //Proteccion contra ataques CSRF
     $id = required_param('id', PARAM_TEXT);
 
     if ($deleteanypost) {
@@ -93,7 +94,7 @@ if ($allowview) {
             echo html_writer::link(
                 new moodle_url(
                     '/local/greetings/index.php',
-                    array('action' => 'del', 'id' => $m->id)
+                    array('action' => 'del', 'id' => $m->id, 'sesskey' => sesskey())
                 ),
                 $OUTPUT->pix_icon('t/delete', '') . get_string('delete')
             );
