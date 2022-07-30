@@ -15,14 +15,14 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * ${PLUGINNAME} file description here.
  *
  * @package    local_greetings
  * @copyright  2022 Sergio Renato Aldana Alvarez <sergior.aldana@me.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined((MOODLE_INTERNAL) || die());
+defined('MOODLE_INTERNAL') || die();
+
 require_once($CFG->libdir . '/formslib.php');
 
 class local_greetings_message_form extends moodleform {
@@ -31,11 +31,11 @@ class local_greetings_message_form extends moodleform {
      */
     public function definition() {
         $mform = $this->_form; // Don't forget the underscore!
-        $mform->addElement('textarea', 'message', get_string('yourmessage', 'local_greetings'));
+
+        $mform->addElement('textarea', 'message', get_string('yourmessage', 'local_greetings')); // Add elements to your form.
         $mform->setType('message', PARAM_TEXT); // Set type of element.
 
         $submitlabel = get_string('submit');
         $mform->addElement('submit', 'submitmessage', $submitlabel);
     }
-
 }

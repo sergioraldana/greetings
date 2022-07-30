@@ -30,24 +30,26 @@ defined('MOODLE_INTERNAL') || die();
  *
  * @param navigation_node $frontpage Node representing the front page in the navigation tree.
  */
-
 function local_greetings_extend_navigation_frontpage(navigation_node $frontpage) {
-    if (isloggedin() && !isguestuser() && $frontpage->showinflatnavigation = get_config('local_greetings', 'showinnavigation')) {
-        $frontpage->add(get_string(
-            'pluginname', 'local_greetings'),
-            new moodle_url('/local/greetings/index.php'),
-            navigation_node::TYPE_CUSTOM,
-            null,
-            null,
-            new pix_icon('t/message', '')
-        );
+    if (get_config('local_greetings', 'showinnavigation')) {
+        if (isloggedin() && !isguestuser()) {
+            $frontpage->add(
+                get_string('pluginname', 'local_greetings'),
+                new moodle_url('/local/greetings/index.php'),
+                navigation_node::TYPE_CUSTOM,
+                null,
+                null,
+                new pix_icon('t/message', '')
+            );
+        }
     }
 }
 
 /**
- * Insert a link to index.php on the site drawer navigation.
+ * Add link to index.php into navigation drawer.
  *
- * @param global_navigation $root Node representing the front page in the navigation tree.
+ * @param global_navigation $root Node representing the global navigation tree.
+ *
  */
 
 function local_greetings_extend_navigation(global_navigation $root) {
@@ -60,11 +62,13 @@ function local_greetings_extend_navigation(global_navigation $root) {
             null,
             new pix_icon('t/message', '')
         );
-        //$node->showinflatnavigation = true;
+
         $node->showinflatnavigation = get_config('local_greetings', 'showinnavigation');
+
         $root->add_node($node);
     }
 }
+
 
 /**
  * Get a localised greeting message for a user
@@ -72,8 +76,7 @@ function local_greetings_extend_navigation(global_navigation $root) {
  * @param \stdClass $user
  * @return string
  */
-
-function local_greetings_get_greeting ($user) {
+function local_greetings_get_greeting($user) {
     if ($user == null) {
         return get_string('greetinguser', 'local_greetings');
     }

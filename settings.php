@@ -15,8 +15,6 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * ${PLUGINNAME} file description here.
- *
  * @package    ${PLUGINNAME}
  * @copyright  2022 renatoalvarez <${USEREMAIL}>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -27,6 +25,7 @@ defined('MOODLE_INTERNAL') || die;
 if ($hassiteconfig) {
     $settings = new admin_settingpage('local_greetings', get_string('pluginname', 'local_greetings'));
     $ADMIN->add('localplugins', $settings);
+
 
     if ($ADMIN->fulltree) {
         require_once($CFG->dirroot . '/local/greetings/lib.php');

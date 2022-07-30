@@ -14,6 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
+/**
+ * Plugin upgrade script.
+ *
+ * @package     local_greetings
+ * @copyright   2022 Your name <your@email>
+ * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -21,13 +29,12 @@ defined('MOODLE_INTERNAL') || die();
 *
 * @param int $oldversion Version number the plugin is being upgraded from.
 */
-
 function xmldb_local_greetings_upgrade($oldversion) {
-global $DB;
-$dbman = $DB->get_manager();
+    global $DB;
+
+    $dbman = $DB->get_manager();
 
     if ($oldversion < 2022061300) {
-
         // Define field userid to be added to local_greetings_messages.
         $table = new xmldb_table('local_greetings_messages');
         $field = new xmldb_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '1', 'timecreated');
@@ -38,7 +45,6 @@ $dbman = $DB->get_manager();
         }
 
         // Define key greetings-user-foreign-key (foreign) to be added to local_greetings_messages.
-        $table = new xmldb_table('local_greetings_messages');
         $key = new xmldb_key('greetings-user-foreign-key', XMLDB_KEY_FOREIGN, ['userid'], 'user', ['id']);
 
         // Launch add key greetings-user-foreign-key.
@@ -48,5 +54,5 @@ $dbman = $DB->get_manager();
         upgrade_plugin_savepoint(true, 2022061300, 'local', 'greetings');
     }
 
-return true;
+    return true;
 }

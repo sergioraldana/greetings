@@ -15,17 +15,18 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
+ * Main file to view greetings
+ *
  * @package     local_greetings
  * @copyright   2022 Sergio Renato Aldana Alvarez <sergior.aldana@me.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 require_once('../../config.php');
-require_once($CFG->dirroot. '/local/greetings/lib.php');
-require_once($CFG->dirroot. '/local/greetings/message_form.php');
+require_once($CFG->dirroot . '/local/greetings/lib.php');
+require_once($CFG->dirroot . '/local/greetings/message_form.php');
 
 $context = context_system::instance();
-
 $PAGE->set_context($context);
 $PAGE->set_url(new moodle_url('/local/greetings/index.php'));
 $PAGE->set_pagelayout('standard');
@@ -38,27 +39,53 @@ if (isguestuser()) {
     throw new moodle_exception('noguest');
 }
 
-$messageform = new local_greetings_message_form();
-
 $allowpost = has_capability('local/greetings:postmessages', $context);
-$allowview = has_capability('local/greetings:viewmessages', $context);
+$deletepost = has_capability('local/greetings:deleteownmessage', $context);
 $deleteanypost = has_capability('local/greetings:deleteanymessage', $context);
 
-if ($action === 'del') {
-    require_sesskey(); //Proteccion contra ataques CSRF
+$action = optional_param('action', '', PARAM_TEXT);
+
+if ($action == 'del') {
+    require_sesskey();
+
     $id = required_param('id', PARAM_TEXT);
 
-    if ($deleteanypost) {
+    if ($deleteanypost || $deletepost) {
         $params = array('id' => $id);
 
+        // Users without permission should only delete their own post.
+        if(!$deleteanypost) {
+            $params += ['userid' => $USER->id];
+        }
+
+        // TODO: Confirm before deleting.
         $DB->delete_records('local_greetings_messages', $params);
+
+        redirect($PAGE->url);
+    }
+}
+
+$messageform = new local_greetings_message_form();
+
+if ($data = $messageform->get_data()) {
+    require_capability('local/greetings:postmessages', $context);
+
+    $message = required_param('message', PARAM_TEXT);
+
+    if (!empty($message)) {
+        $record = new stdClass;
+        $record->message = $message;
+        $record->timecreated = time();
+        $record->userid = $USER->id;
+
+        $DB->insert_record('local_greetings_messages', $record);
     }
 }
 
 echo $OUTPUT->header();
 
 if (isloggedin()) {
-    echo local_greetings_get_greeting($USER);
+    echo $OUTPUT->heading(local_greetings_get_greeting($USER));
 } else {
     echo get_string('greetinguser', 'local_greetings');
 }
@@ -67,18 +94,19 @@ if ($allowpost) {
     $messageform->display();
 }
 
-if ($allowview) {
+if (has_capability('local/greetings:viewmessages', $context)) {
     $userfields = \core_user\fields::for_name()->with_identity($context);
     $userfieldssql = $userfields->get_sql('u');
 
     $sql = "SELECT m.id, m.message, m.timecreated, m.userid {$userfieldssql->selects}
-        FROM {local_greetings_messages} m
-        LEFT JOIN {user} u ON u.id = m.userid
-        ORDER BY timecreated DESC";
+              FROM {local_greetings_messages} m
+         LEFT JOIN {user} u ON u.id = m.userid
+          ORDER BY timecreated DESC";
 
     $messages = $DB->get_records_sql($sql);
 
     echo $OUTPUT->box_start('card-columns');
+
     foreach ($messages as $m) {
         echo html_writer::start_tag('div', array('class' => 'card'));
         echo html_writer::start_tag('div', array('class' => 'card-body'));
@@ -87,35 +115,25 @@ if ($allowview) {
         echo html_writer::start_tag('p', array('class' => 'card-text'));
         echo html_writer::tag('small', userdate($m->timecreated), array('class' => 'text-muted'));
         echo html_writer::end_tag('p');
-        echo html_writer::end_tag('div');
 
-        if ($deleteanypost) {
-            echo html_writer::start_tag('div', array('class' => 'card-footer text-center'));
+        if ($deleteanypost || ($deletepost && $m->userid == $USER->id)) {
+            echo html_writer::start_tag('p', array('class' => 'card-footer text-center'));
             echo html_writer::link(
                 new moodle_url(
                     '/local/greetings/index.php',
                     array('action' => 'del', 'id' => $m->id, 'sesskey' => sesskey())
                 ),
-                $OUTPUT->pix_icon('t/delete', '') . get_string('delete')
+                $OUTPUT->pix_icon('t/delete', ''),
+                array('role' => 'button', 'aria-label' => get_string('delete'), 'title' => get_string('delete'))
             );
-            echo html_writer::end_tag('div');
+            echo html_writer::end_tag('p');
         }
+
+        echo html_writer::end_tag('div');
         echo html_writer::end_tag('div');
     }
+
     echo $OUTPUT->box_end();
-}
-
-if ($data = $messageform->get_data()) {
-    require_capability('local/greetings:postmessages', $context);
-    $message = required_param('message', PARAM_TEXT);
-
-    if (!empty($message)) {
-        $record = new stdClass();
-        $record->message = $message;
-        $record->timecreated = time();
-        $record->userid = $USER->id;
-        $DB->insert_record('local_greetings_messages', $record);
-    }
 }
 
 echo $OUTPUT->footer();

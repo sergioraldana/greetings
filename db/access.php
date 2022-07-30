@@ -15,12 +15,12 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * ${PLUGINNAME} file description here.
- *
- * @package    ${PLUGINNAME}
- * @copyright  2022 renatoalvarez <${USEREMAIL}>
+ * @package    Greetings
+ * @copyright  2022 renatoalvarez
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+defined('MOODLE_INTERNAL') || die();
 
 $capabilities = array(
     'local/greetings:postmessages' => array(
@@ -32,16 +32,22 @@ $capabilities = array(
         )
     ),
     'local/greetings:viewmessages' => array(
-        'riskbitmask' => RISK_SPAM,
         'captype' => 'read',
         'contextlevel' => CONTEXT_SYSTEM,
         'archetypes' => array(
             'user' => CAP_ALLOW,
         )
     ),
+    'local/greetings:deleteownmessage' => array(
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'archetypes' => array(
+            'user' => CAP_ALLOW,
+        )
+    ),
     'local/greetings:deleteanymessage' => array(
-        'riskbitmask' => RISK_SPAM,
-        'captype' => 'delete',
+        'riskbitmask' => RISK_DATALOSS,
+        'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
         'archetypes' => array(
             'user' => CAP_ALLOW,
